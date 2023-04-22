@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["gizmos","prelude"],"struct":["GizmoConfig","GizmoPlugin"]};
