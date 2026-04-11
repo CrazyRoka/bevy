@@ -154,9 +154,11 @@ impl<T: NoUninit> RawBufferVec<T> {
     /// the `RawBufferVec` was created, the buffer on the [`RenderDevice`]
     /// is marked as [`BufferUsages::COPY_DST`](BufferUsages).
     pub fn reserve(&mut self, capacity: usize, device: &RenderDevice) {
-        let size = self.item_size * capacity;
-        if capacity > self.capacity || (self.changed && size > 0) {
-            self.capacity = capacity;
+        if capacity > self.capacity || (self.changed && capacity > 0) {
+            if capacity > self.capacity {
+                self.capacity = capacity.max(self.capacity * 2);
+            }
+            let size = self.item_size * self.capacity;
             self.buffer = Some(device.create_buffer(&wgpu::BufferDescriptor {
                 label: make_buffer_label::<Self>(&self.label),
                 size: size as BufferAddress,
@@ -383,9 +385,11 @@ where
     /// the `AtomicRawBufferVec` was created, the buffer on the [`RenderDevice`]
     /// is marked as [`BufferUsages::COPY_DST`](BufferUsages).
     pub fn reserve(&mut self, capacity: usize, device: &RenderDevice) {
-        let size = size_of::<T::Blob>() * capacity;
-        if capacity > self.capacity || (self.changed && size > 0) {
-            self.capacity = capacity;
+        if capacity > self.capacity || (self.changed && capacity > 0) {
+            if capacity > self.capacity {
+                self.capacity = capacity.max(self.capacity * 2);
+            }
+            let size = size_of::<T::Blob>() * self.capacity;
             self.buffer = Some(device.create_buffer(&wgpu::BufferDescriptor {
                 label: make_buffer_label::<Self>(&self.label),
                 size: size as BufferAddress,
@@ -609,8 +613,9 @@ where
         if capacity <= self.capacity && !self.label_changed {
             return;
         }
-
-        self.capacity = capacity;
+        if capacity > self.capacity {
+            self.capacity = capacity.max(self.capacity * 2);
+        }
         let size = u64::from(T::min_size()) as usize * capacity;
         self.buffer = Some(device.create_buffer(&wgpu::BufferDescriptor {
             label: make_buffer_label::<Self>(&self.label),
@@ -793,8 +798,9 @@ where
         if capacity <= self.capacity && !self.label_changed {
             return;
         }
-
-        self.capacity = capacity;
+        if capacity > self.capacity {
+            self.capacity = capacity.max(self.capacity * 2);
+        }
         let size = self.item_size * capacity;
         self.buffer = Some(device.create_buffer(&wgpu::BufferDescriptor {
             label: make_buffer_label::<Self>(&self.label),
@@ -883,9 +889,8 @@ where
         if capacity <= self.capacity {
             return;
         }
-
-        let size = size_of::<T>() * capacity;
-        self.capacity = capacity;
+        self.capacity = capacity.max(self.capacity * 2);
+        let size = size_of::<T>() * self.capacity;
         self.buffer = Some(render_device.create_buffer(&wgpu::BufferDescriptor {
             label: Some(&self.label),
             size: size as u64,
