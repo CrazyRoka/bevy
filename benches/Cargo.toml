@@ -110,3 +110,7 @@ harness = false
 name = "tasks"
 path = "benches/bevy_tasks/main.rs"
 harness = false
+
+[features]
+# Forces the wgpu instance to be initialized using the raw Vulkan HAL, enabling additional configuration
+raw_vulkan_init = ["bevy_render/raw_vulkan_init"]
