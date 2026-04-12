@@ -32,7 +32,7 @@ impl Prepare for TestCommand {
                     sh,
                     // `--benches` runs each benchmark once in order to verify that they behave
                     // correctly and do not panic.
-                    "cargo test --workspace --benches {no_fail_fast...} {jobs...}"
+                    "cargo test --workspace --benches --features raw_vulkan_init {no_fail_fast...} {jobs...}"
                 ),
                 "Please fix failing tests in output above.",
             )
