@@ -40,7 +40,7 @@ impl ColorAttachment {
     /// The returned attachment will always have writing enabled (`store: StoreOp::Load`).
     pub fn get_attachment(&self) -> RenderPassColorAttachment<'_> {
         if let Some(resolve_target) = self.resolve_target.as_ref() {
-            let first_call = self.is_first_call.fetch_and(false, Ordering::SeqCst);
+            let first_call = self.is_first_call.fetch_and(false, Ordering::Relaxed);
 
             RenderPassColorAttachment {
                 view: &resolve_target.default_view,
@@ -64,7 +64,7 @@ impl ColorAttachment {
     ///
     /// The returned attachment will always have writing enabled (`store: StoreOp::Load`).
     pub fn get_unsampled_attachment(&self) -> RenderPassColorAttachment<'_> {
-        let first_call = self.is_first_call.fetch_and(false, Ordering::SeqCst);
+        let first_call = self.is_first_call.fetch_and(false, Ordering::Relaxed);
 
         RenderPassColorAttachment {
             view: &self.texture.default_view,
@@ -81,7 +81,7 @@ impl ColorAttachment {
     }
 
     pub(crate) fn mark_as_cleared(&self) {
-        self.is_first_call.store(false, Ordering::SeqCst);
+        self.is_first_call.store(false, Ordering::Relaxed);
     }
 }
 
@@ -108,7 +108,7 @@ impl DepthAttachment {
     pub fn get_attachment(&self, store: StoreOp) -> RenderPassDepthStencilAttachment<'_> {
         let first_call = self
             .is_first_call
-            .fetch_and(store != StoreOp::Store, Ordering::SeqCst);
+            .fetch_and(store != StoreOp::Store, Ordering::Relaxed);
 
         RenderPassDepthStencilAttachment {
             view: &self.view,
@@ -148,7 +148,7 @@ impl OutputColorAttachment {
     /// the provided `clear_color` if this is the first time calling this function, otherwise it
     /// will be loaded.
     pub fn get_attachment(&self, clear_color: Option<LinearRgba>) -> RenderPassColorAttachment<'_> {
-        let first_call = self.is_first_call.fetch_and(false, Ordering::SeqCst);
+        let first_call = self.is_first_call.fetch_and(false, Ordering::Relaxed);
 
         RenderPassColorAttachment {
             view: &self.view,
@@ -168,6 +168,6 @@ impl OutputColorAttachment {
     // we re-use is_first_call atomic to track usage, which assumes that calls to get_attachment
     // are always consumed by a render pass that writes to the attachment
     pub fn needs_present(&self) -> bool {
-        !self.is_first_call.load(Ordering::SeqCst)
+        !self.is_first_call.load(Ordering::Relaxed)
     }
 }
