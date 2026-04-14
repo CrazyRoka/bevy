@@ -3560,6 +3560,17 @@ category = "Stress Tests"
 wasm = true
 
 [[example]]
+name = "many_shadow_lights"
+path = "examples/stress_tests/many_shadow_lights.rs"
+doc-scrape-examples = true
+
+[package.metadata.example.many_shadow_lights]
+name = "Many Shadow Lights"
+description = "Benchmark to test shadow extraction overhead"
+category = "Stress Tests"
+wasm = true
+
+[[example]]
 name = "many_materials"
 path = "examples/stress_tests/many_materials.rs"
 doc-scrape-examples = true
