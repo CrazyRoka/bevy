@@ -15,6 +15,7 @@ use bevy_ecs::{
     prelude::*,
     schedule::{IntoScheduleConfigs, Schedule, ScheduleLabel, SystemSet},
 };
+#[cfg(feature = "trace")]
 use bevy_log::info_span;
 use bevy_render::{
     camera::{ExtractedCamera, SortedCameras},
@@ -171,10 +172,12 @@ pub fn camera_driver(world: &mut World) {
 
 pub(crate) fn submit_pending_command_buffers(world: &mut World) {
     let mut pending = world.resource_mut::<PendingCommandBuffers>();
+    #[cfg(feature = "trace")]
     let buffer_count = pending.len();
     let buffers = pending.take();
 
     if !buffers.is_empty() {
+        #[cfg(feature = "trace")]
         let _span = info_span!("queue_submit", count = buffer_count).entered();
         let queue = world.resource::<RenderQueue>();
         queue.submit(buffers);
