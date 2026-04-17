@@ -110,3 +110,8 @@ harness = false
 name = "tasks"
 path = "benches/bevy_tasks/main.rs"
 harness = false
+
+[[bench]]
+name = "camera"
+path = "benches/bevy_camera/main.rs"
+harness = false
